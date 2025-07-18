@@ -11,6 +11,8 @@ from torch.utils.data import DataLoader, Dataset
 import os
 from PIL import Image
 
+## teste de commit
+
 # Função para carregar áudio e gerar mel-espectrograma
 def create_mel_spectrogram(audio_path, sr=22050, n_mels=128, hop_length=512):
     y, sr = librosa.load(audio_path, sr=sr)
