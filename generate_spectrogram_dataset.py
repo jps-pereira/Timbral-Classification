@@ -25,11 +25,11 @@ def create_stft_spectrogram(y, sr=SR, n_fft=N_FFT, hop_length=HOP_LENGTH):
     return stft_db
 
 # Função para salvar espectrogramas como imagens
-def save_spectrogram_as_image(spectrogram, filename, cmap='viridis'):
+def save_spectrogram_as_image(spectrogram, filename, cmap='magma'):
     plt.figure(figsize=(10, 4))
     librosa.display.specshow(spectrogram, x_axis='time', y_axis='mel' if 'mel' in filename else 'log', cmap=cmap)
     plt.colorbar(format='%+2.0f dB')
-    plt.title(filename.split('/')[-1].replace('_', ' ').replace('-', ' ').replace(' .png', ''))
+    #plt.title(filename.split('/')[-1].replace('_', ' ').replace('-', ' ').replace(' .png', ''))
     plt.tight_layout()
     plt.savefig(filename)
     plt.close()
@@ -67,13 +67,13 @@ def process_audio_file(audio_path, output_base_dir):
         stft_output_dir = os.path.join(output_base_dir, 'stft_spectrograms', class_name)
         os.makedirs(stft_output_dir, exist_ok=True)
         stft_output_path = os.path.join(stft_output_dir, f'{audio_filename_base}_segment_{i:03d}_stft.png')
-        save_spectrogram_as_image(stft_spec, stft_output_path, cmap='gray_r')
+        save_spectrogram_as_image(stft_spec, stft_output_path, cmap='magma')
 
     print(f"  -> {num_segments} segmentos processados para {audio_path}")
 
 if __name__ == '__main__':
-    input_audio_base_dir = './WAVs'
-    output_dataset_base_dir = './dataset_spectrograms'
+    input_audio_base_dir = './dataset_wav'
+    output_dataset_base_dir = './dataset_png'
 
     # Estrutura de diretórios de áudio fornecida pelo usuário
     audio_structure = {

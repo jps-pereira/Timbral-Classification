@@ -1,4 +1,3 @@
-
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -26,11 +25,11 @@ def create_stft_spectrogram(audio_path, sr=22050, n_fft=2048, hop_length=512):
     return stft_db
 
 # Função para salvar espectrogramas como imagens
-def save_spectrogram_as_image(spectrogram, filename, cmap='viridis'):
+def save_spectrogram_as_image(spectrogram, filename, cmap='magma'):
     plt.figure(figsize=(10, 4))
     librosa.display.specshow(spectrogram, x_axis='time', y_axis='mel' if 'mel' in filename else 'log', cmap=cmap)
     plt.colorbar(format='%+2.0f dB')
-    plt.title(filename.split('/')[-1].replace('_', ' ').replace('.png', ''))
+    #plt.title(filename.split('/')[-1].replace('_', ' ').replace('.png', ''))
     plt.tight_layout()
     plt.savefig(filename)
     plt.close()
@@ -50,10 +49,6 @@ def save_spectrogram_as_image(spectrogram, filename, cmap='viridis'):
 #     # save_spectrogram_as_image(stft_spec, 'spectrograms/stft/audio_stft_spectrogram.png')
 
 #     print("Espectrogramas gerados e salvos.")
-
-
-
-
 
 
 class SpectrogramDataset(Dataset):
@@ -86,9 +81,6 @@ def get_transforms():
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-
-
-
 
 
 # Função para carregar o modelo e configurar para Transfer Learning
@@ -160,9 +152,6 @@ def evaluate_model(model, dataloader):
     return accuracy
 
 
-
-
-
 if __name__ == '__main__':
     # 1. Preparação dos dados (substitua por seus próprios dados)
     # Para este exemplo, vamos simular a criação de alguns arquivos de imagem de espectrograma
@@ -170,29 +159,29 @@ if __name__ == '__main__':
     # e organizadas por classe (ex: data/mel_spectrograms/class1/audio1.png, data/mel_spectrograms/class2/audio2.png)
 
     # Criar diretórios de exemplo para simular dados
-    os.makedirs('data/mel_spectrograms/class_a', exist_ok=True)
-    os.makedirs('data/mel_spectrograms/class_b', exist_ok=True)
-    os.makedirs('data/stft_spectrograms/class_a', exist_ok=True)
-    os.makedirs('data/stft_spectrograms/class_b', exist_ok=True)
+    #os.makedirs('data/mel_spectrograms/class_a', exist_ok=True)
+    #os.makedirs('data/mel_spectrograms/class_b', exist_ok=True)
+    #os.makedirs('data/stft_spectrograms/class_a', exist_ok=True)
+    #os.makedirs('data/stft_spectrograms/class_b', exist_ok=True)
 
     # Criar arquivos dummy para simular imagens de espectrogramas
     # Em um cenário real, estas seriam imagens PNG/JPG reais de espectrogramas
-    dummy_image_data = np.random.randint(0, 255, size=(224, 224, 3), dtype=np.uint8)
-    dummy_image = Image.fromarray(dummy_image_data)
+    #dummy_image_data = np.random.randint(0, 255, size=(224, 224, 3), dtype=np.uint8)
+    #dummy_image = Image.fromarray(dummy_image_data)
 
-    for i in range(50):
-        dummy_image.save(f'data/mel_spectrograms/class_a/mel_a_{i}.png')
-        dummy_image.save(f'data/mel_spectrograms/class_b/mel_b_{i}.png')
-        dummy_image.save(f'data/stft_spectrograms/class_a/stft_a_{i}.png')
-        dummy_image.save(f'data/stft_spectrograms/class_b/stft_b_{i}.png')
+    #for i in range(50):
+        #dummy_image.save(f'data/mel_spectrograms/class_a/mel_a_{i}.png')
+        #dummy_image.save(f'data/mel_spectrograms/class_b/mel_b_{i}.png')
+        #dummy_image.save(f'data/stft_spectrograms/class_a/stft_a_{i}.png')
+        #dummy_image.save(f'data/stft_spectrograms/class_b/stft_b_{i}.png')
 
-    print("Arquivos dummy de espectrogramas criados para demonstração.")
+    #print("Arquivos dummy de espectrogramas criados para demonstração.")
 
     # 2. Carregar Datasets e Dataloaders
     data_transforms = get_transforms()
 
     # Mel-espectrogramas
-    mel_dataset = SpectrogramDataset(img_dir='data/mel_spectrograms', transform=data_transforms)
+    mel_dataset = SpectrogramDataset(img_dir='dataset_png/mel_spectrograms', transform=data_transforms)
     mel_train_size = int(0.8 * len(mel_dataset))
     mel_val_size = len(mel_dataset) - mel_train_size
     mel_train_dataset, mel_val_dataset = torch.utils.data.random_split(mel_dataset, [mel_train_size, mel_val_size])
@@ -205,7 +194,7 @@ if __name__ == '__main__':
     print(f"Mel-spectrograms: {mel_num_classes} classes encontradas.")
 
     # STFT-espectrogramas
-    stft_dataset = SpectrogramDataset(img_dir='data/stft_spectrograms', transform=data_transforms)
+    stft_dataset = SpectrogramDataset(img_dir='dataset_png/stft_spectrograms', transform=data_transforms)
     stft_train_size = int(0.8 * len(stft_dataset))
     stft_val_size = len(stft_dataset) - stft_train_size
     stft_train_dataset, stft_val_dataset = torch.utils.data.random_split(stft_dataset, [stft_train_size, stft_val_size])
@@ -238,8 +227,6 @@ if __name__ == '__main__':
     torch.save(mel_model.state_dict(), 'mel_resnet_model.pth')
     torch.save(stft_model.state_dict(), 'stft_resnet_model.pth')
     print("Modelos treinados salvos como mel_resnet_model.pth e stft_resnet_model.pth")
-
-
 
 
 
