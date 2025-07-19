@@ -252,9 +252,6 @@ def evaluate_ensemble_model(ensemble_model, mel_dataloader, stft_dataloader, cla
     return accuracy
 
 
-
-
-
     # 4. Fusão dos dois modelos (Ensemble)
     print("\nRealizando fusão dos modelos (Ensemble)...")
     # Certifique-se de que mel_num_classes e stft_num_classes são os mesmos
