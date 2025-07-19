@@ -226,7 +226,9 @@ def main():
                         for bar, conf in zip(bars, confidences):
                             height = bar.get_height()
                             ax.text(bar.get_x() + bar.get_width()/2., height + 0.01,
-                                   f'{conf:.2%}', ha='center', va='bottom')
+                                   f'{conf:.2%}', 
+                                   ha='center', 
+                                   va='bottom')
                         
                         st.pyplot(fig)
                     
@@ -235,4 +237,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
