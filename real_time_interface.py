@@ -1,12 +1,3 @@
-import asyncio
-
-try:
-    asyncio.get_running_loop()
-except RuntimeError:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-
 import streamlit as st
 import torch
 import librosa
@@ -84,57 +75,58 @@ def load_models():
 
 # Função para processar áudio e fazer predição
 def predict_audio(audio_file, mel_model, stft_model, ensemble_model):
-    import tempfile, os, torch
-    from PIL import Image
-    import librosa
-
-    tmp_path = mel_img_path = stft_img_path = None  # Inicializa para evitar erros no finally
-
+    # Salvar arquivo temporário
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+        tmp_file.write(audio_file.read())
+        tmp_path = tmp_file.name
+    
     try:
-        # Salvar arquivo temporário
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
-            tmp_file.write(audio_file.read())
-            tmp_path = tmp_file.name
+        # Carregar áudio com librosa
+        y, sr = librosa.load(tmp_path, sr=22050) # Usar SR do audio_classifier
 
-        # Carregar áudio
-        y, sr = librosa.load(tmp_path, sr=22050)
-
-        # Gerar espectrogramas
+        # Gerar espectrogramas (passando y e sr, não o caminho do arquivo)
         mel_spec = create_mel_spectrogram(y, sr=sr)
         stft_spec = create_stft_spectrogram(y, sr=sr)
-
-        # Salvar espectrogramas como imagens
+        
+        # Salvar espectrogramas como imagens temporárias
         mel_img_path = tempfile.mktemp(suffix="_mel.png")
         stft_img_path = tempfile.mktemp(suffix="_stft.png")
+        
         save_spectrogram_as_image(mel_spec, mel_img_path)
         save_spectrogram_as_image(stft_spec, stft_img_path)
-
+        
         # Carregar e transformar imagens
         transform = get_transforms()
-        mel_image = Image.open(mel_img_path).convert("RGB")
-        stft_image = Image.open(stft_img_path).convert("RGB")
+        
+        mel_image = Image.open(mel_img_path).convert('RGB')
+        stft_image = Image.open(stft_img_path).convert('RGB')
+        
         mel_tensor = transform(mel_image).unsqueeze(0)
         stft_tensor = transform(stft_image).unsqueeze(0)
-
-        # Enviar para o dispositivo
+        
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         mel_tensor = mel_tensor.to(device)
         stft_tensor = stft_tensor.to(device)
-
-        # Predições
+        
+        # Fazer predições
         with torch.no_grad():
             mel_output = mel_model(mel_tensor)
             stft_output = stft_model(stft_tensor)
             ensemble_output = ensemble_model(mel_tensor, stft_tensor)
-
+            
             mel_prob = torch.softmax(mel_output, dim=1)
             stft_prob = torch.softmax(stft_output, dim=1)
             ensemble_prob = torch.softmax(ensemble_output, dim=1)
-
+            
             mel_pred = torch.argmax(mel_prob, dim=1).item()
             stft_pred = torch.argmax(stft_prob, dim=1).item()
             ensemble_pred = torch.argmax(ensemble_prob, dim=1).item()
-
+        
+        # Limpar arquivos temporários
+        os.unlink(tmp_path)
+        os.unlink(mel_img_path)
+        os.unlink(stft_img_path)
+        
         return {
             'mel_prediction': mel_pred,
             'stft_prediction': stft_pred,
@@ -145,19 +137,12 @@ def predict_audio(audio_file, mel_model, stft_model, ensemble_model):
             'mel_spectrogram': mel_spec,
             'stft_spectrogram': stft_spec
         }
-
+        
     except Exception as e:
+        # Certifique-se de que o arquivo temporário é removido mesmo em caso de erro
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
         raise e
-
-    finally:
-        # Limpar arquivos temporários
-        for path in [tmp_path, mel_img_path, stft_img_path]:
-            try:
-                if path and os.path.exists(path):
-                    os.unlink(path)
-            except:
-                pass
-
 
 # Interface principal
 def main():
@@ -240,15 +225,9 @@ def main():
                         # Adicionar valores nas barras
                         for bar, conf in zip(bars, confidences):
                             height = bar.get_height()
-                            ax.text(
-                                bar.get_x() + bar.get_width()/2.,
-                                height + 0.01,
-                                f'{conf:.2%}',
-                                ha='center',
-                                va='bottom'
-                                
-                            )
-
+                            ax.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                                   f'{conf:.2%}', ha='center', va='bottom')
+                        
                         st.pyplot(fig)
                     
                 except Exception as e:
@@ -256,5 +235,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
