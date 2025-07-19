@@ -79,7 +79,7 @@ def load_resnet_model(num_classes, weights):
     return model
 
 # Função de treinamento do modelo
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=30, patience=5):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=40, patience=6):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -252,7 +252,7 @@ if __name__ == '__main__':
     mel_model = load_resnet_model(mel_num_classes,weights=ResNet18_Weights.DEFAULT)
     mel_criterion = nn.CrossEntropyLoss()
     mel_optimizer = optim.Adam(mel_model.parameters(), lr=0.001)
-    mel_model = train_model(mel_model, mel_dataloaders, mel_criterion, mel_optimizer, num_epochs=30, patience=5)
+    mel_model = train_model(mel_model, mel_dataloaders, mel_criterion, mel_optimizer, num_epochs=40, patience=6)
     print("Avaliando modelo de Mel-espectrogramas no conjunto de validação:")
     evaluate_model(mel_model, mel_dataloaders['val'])
 
@@ -260,7 +260,7 @@ if __name__ == '__main__':
     stft_model = load_resnet_model(stft_num_classes,weights=ResNet18_Weights.DEFAULT)
     stft_criterion = nn.CrossEntropyLoss()
     stft_optimizer = optim.Adam(stft_model.parameters(), lr=0.001)
-    stft_model = train_model(stft_model, stft_dataloaders, stft_criterion, stft_optimizer, num_epochs=30, patience=5)
+    stft_model = train_model(stft_model, stft_dataloaders, stft_criterion, stft_optimizer, num_epochs=40, patience=6)
     print("Avaliando modelo de STFT-espectrogramas no conjunto de validação:")
     evaluate_model(stft_model, stft_dataloaders['val'])
 
