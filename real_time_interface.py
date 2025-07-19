@@ -7,6 +7,7 @@ from PIL import Image
 import io
 import tempfile
 import os
+import torchvision.models as models
 from audio_classifier import (
     create_mel_spectrogram, 
     create_stft_spectrogram, 
@@ -48,8 +49,9 @@ def load_models():
         return None, None, None, None
     
     # Carregar modelos individuais
-    mel_model = load_resnet_model(num_classes)
-    stft_model = load_resnet_model(num_classes)
+    # Usando weights=models.ResNet18_Weights.DEFAULT para resolver o warning de depreciação
+    mel_model = load_resnet_model(num_classes, weights=models.ResNet18_Weights.DEFAULT)
+    stft_model = load_resnet_model(num_classes, weights=models.ResNet18_Weights.DEFAULT)
     
     # Tentar carregar os pesos salvos
     try:
@@ -98,8 +100,8 @@ def predict_audio(audio_file, mel_model, stft_model, ensemble_model):
         # Carregar e transformar imagens
         transform = get_transforms()
         
-        mel_image = Image.open(mel_img_path).convert('RGB')
-        stft_image = Image.open(stft_img_path).convert('RGB')
+        mel_image = Image.open(mel_img_path).convert("RGB")
+        stft_image = Image.open(stft_img_path).convert("RGB")
         
         mel_tensor = transform(mel_image).unsqueeze(0)
         stft_tensor = transform(stft_image).unsqueeze(0)
@@ -226,9 +228,7 @@ def main():
                         for bar, conf in zip(bars, confidences):
                             height = bar.get_height()
                             ax.text(bar.get_x() + bar.get_width()/2., height + 0.01,
-                                   f'{conf:.2%}', 
-                                   ha='center', 
-                                   va='bottom')
+                                   f'{conf:.2%}', ha='center', va='bottom')
                         
                         st.pyplot(fig)
                     
