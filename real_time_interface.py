@@ -8,6 +8,7 @@ import io
 import tempfile
 import os
 import torchvision.models as models
+from torchvision.models import resnet18, ResNet18_Weights
 from audio_classifier import (
     create_mel_spectrogram, 
     create_stft_spectrogram, 
@@ -50,8 +51,8 @@ def load_models():
     
     # Carregar modelos individuais
     # Usando weights=models.ResNet18_Weights.DEFAULT para resolver o warning de depreciação
-    mel_model = load_resnet_model(num_classes, weights=models.ResNet18_Weights.DEFAULT)
-    stft_model = load_resnet_model(num_classes, weights=models.ResNet18_Weights.DEFAULT)
+    mel_model = load_resnet_model(num_classes, weights=ResNet18_Weights.DEFAULT)
+    stft_model = load_resnet_model(num_classes, weights=ResNet18_Weights.DEFAULT)
     
     # Tentar carregar os pesos salvos
     try:
