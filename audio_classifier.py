@@ -79,7 +79,7 @@ def load_resnet_model(num_classes, weights):
     return model
 
 # Função de treinamento do modelo
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=20, patience=4):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=30, patience=5):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -158,9 +158,6 @@ def evaluate_model(model, dataloader):
     accuracy = corrects.double() / total
     print(f'Accuracy: {accuracy:.4f}')
     return accuracy
-
-
-
 
 
 # Classe para o Ensemble Model
@@ -252,18 +249,18 @@ if __name__ == '__main__':
 
     # 3. Treinar e avaliar modelos separadamente
     print("Treinando modelo para Mel-espectrogramas...")
-    mel_model = load_resnet_model(mel_num_classes)
+    mel_model = load_resnet_model(mel_num_classes,weights=ResNet18_Weights.DEFAULT)
     mel_criterion = nn.CrossEntropyLoss()
     mel_optimizer = optim.Adam(mel_model.parameters(), lr=0.001)
-    mel_model = train_model(mel_model, mel_dataloaders, mel_criterion, mel_optimizer, num_epochs=20, patience=4)
+    mel_model = train_model(mel_model, mel_dataloaders, mel_criterion, mel_optimizer, num_epochs=30, patience=5)
     print("Avaliando modelo de Mel-espectrogramas no conjunto de validação:")
     evaluate_model(mel_model, mel_dataloaders['val'])
 
     print("Treinando modelo para STFT-espectrogramas...")
-    stft_model = load_resnet_model(stft_num_classes)
+    stft_model = load_resnet_model(stft_num_classes,weights=ResNet18_Weights.DEFAULT)
     stft_criterion = nn.CrossEntropyLoss()
     stft_optimizer = optim.Adam(stft_model.parameters(), lr=0.001)
-    stft_model = train_model(stft_model, stft_dataloaders, stft_criterion, stft_optimizer, num_epochs=20, patience=4)
+    stft_model = train_model(stft_model, stft_dataloaders, stft_criterion, stft_optimizer, num_epochs=30, patience=5)
     print("Avaliando modelo de STFT-espectrogramas no conjunto de validação:")
     evaluate_model(stft_model, stft_dataloaders['val'])
 
