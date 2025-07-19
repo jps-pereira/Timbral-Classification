@@ -6,7 +6,7 @@ Este projeto implementa um sistema completo de classificação de áudio usando 
 
 - **Processamento de Áudio**: Conversão de arquivos de áudio em mel-espectrogramas e espectrogramas STFT
 - **Transfer Learning**: Utiliza ResNet18 pré-treinada para classificação de imagens de espectrogramas
-- **Ensemble Learning**: Combina predições de ambos os modelos para melhor performance
+- **Ensemble Learning**: Combina predições de ambos os modelos
 - **Interface Web**: Interface Streamlit para classificação em tempo real
 - **Métricas Detalhadas**: Avaliação completa com relatórios de classificação
 
@@ -18,6 +18,7 @@ Este projeto implementa um sistema completo de classificação de áudio usando 
 ```bash
 pip install -r requirements.txt
 ```
+3. Preferencialmente faça a instalação em ambiente virtual para não haver conflitos entre as bibliotecas.
 
 ## 📁 Estrutura do Projeto
 
@@ -25,10 +26,10 @@ pip install -r requirements.txt
 ├── audio_classifier.py      # Script principal de treinamento
 ├── real_time_interface.py   # Interface web Streamlit
 ├── requirements.txt         # Dependências do projeto
-├── README.md               # Documentação
-└── data/                   # Diretório para dados de treinamento
-    ├── mel_spectrograms/   # Imagens de mel-espectrogramas
-    └── stft_spectrograms/  # Imagens de espectrogramas STFT
+├── README.md                # Documentação
+└── dataset_png/             # Diretório para dados de treinamento
+    ├── mel_spectrograms/    # Imagens de mel-espectrogramas
+    └── stft_spectrograms/   # Imagens de espectrogramas STFT
 ```
 
 ## 🎯 Como Usar
@@ -38,21 +39,27 @@ pip install -r requirements.txt
 Organize seus dados de áudio da seguinte forma:
 
 ```
-data/
+dataset_png/
 ├── mel_spectrograms/
-│   ├── classe_a/
-│   │   ├── audio1_mel.png
-│   │   └── audio2_mel.png
-│   └── classe_b/
-│       ├── audio3_mel.png
-│       └── audio4_mel.png
+│   ├── classe_x/
+│   │   ├── classe_x_musica_a.png
+│   │   └── classe_x_musica_b.png
+│   └── classe_y/
+│       ├── classe_y_musica_a.png
+│       └── classe_y_musica_b.png
+|       .
+|       .
+|       .
 └── stft_spectrograms/
-    ├── classe_a/
-    │   ├── audio1_stft.png
-    │   └── audio2_stft.png
-    └── classe_b/
-        ├── audio3_stft.png
-        └── audio4_stft.png
+    ├── classe_x/
+    │   ├── classe_x_musica_a.png
+    │   └── classe_x_musica_b.png
+    └── classe_y/
+        ├── classe_y_musica_a.png
+        └── classe_y_musica_b.png
+        .
+        .
+        .
 ```
 
 ### 2. Treinamento dos Modelos
@@ -64,7 +71,7 @@ python audio_classifier.py
 ```
 
 Este script irá:
-- Gerar dados dummy para demonstração (substitua pelos seus dados reais)
+
 - Treinar modelos separados para mel-espectrogramas e STFT
 - Avaliar a performance de cada modelo
 - Criar e avaliar o modelo ensemble
@@ -84,20 +91,6 @@ A interface permite:
 - Classificação usando os três modelos (Mel, STFT, Ensemble)
 - Comparação de confiança entre os métodos
 
-## 🔧 Funcionalidades Principais
-
-### Processamento de Áudio
-
-```python
-# Gerar mel-espectrograma
-mel_spec = create_mel_spectrogram(audio_path)
-
-# Gerar espectrograma STFT
-stft_spec = create_stft_spectrogram(audio_path)
-
-# Salvar como imagem
-save_spectrogram_as_image(mel_spec, 'output.png')
-```
 
 ### Transfer Learning
 
@@ -144,55 +137,7 @@ O sistema fornece:
 - **Batch size**: 4
 - **Learning rate**: 0.001
 - **Optimizer**: Adam
-- **Épocas**: 25 (configurável)
-
-## 🔄 Fluxo de Trabalho
-
-1. **Carregamento**: Áudio → Librosa
-2. **Conversão**: Áudio → Espectrogramas (Mel + STFT)
-3. **Visualização**: Espectrogramas → Imagens PNG
-4. **Treinamento**: Imagens → CNN (ResNet18)
-5. **Ensemble**: Combinação dos modelos
-6. **Inferência**: Novo áudio → Classificação
-
-## 🚨 Notas Importantes
-
-- **Dados Dummy**: O script atual gera dados fictícios para demonstração
-- **Dados Reais**: Substitua pela sua estrutura de dados real
-- **Classes**: Adapte o número de classes conforme seu problema
-- **Hardware**: GPU recomendada para treinamento mais rápido
-
-## 🔧 Personalização
-
-### Adicionar Novas Classes
-1. Modifique a estrutura de diretórios
-2. Ajuste `num_classes` no código
-3. Atualize `class_names` na interface
-
-### Modificar Arquitetura
-- Substitua ResNet18 por outros modelos (ResNet50, EfficientNet, etc.)
-- Ajuste a camada de ensemble para combinações mais complexas
-
-### Otimizar Performance
-- Aumente o número de épocas
-- Ajuste learning rate
-- Implemente data augmentation
-- Use técnicas de regularização
-
-## 📈 Resultados Esperados
-
-O sistema fornece três tipos de predição:
-- **Mel-espectrograma**: Focado em características perceptuais
-- **STFT**: Focado em características espectrais detalhadas
-- **Ensemble**: Combinação otimizada de ambos
-
-## 🤝 Contribuições
-
-Para melhorar o sistema:
-1. Implemente data augmentation
-2. Adicione mais arquiteturas de rede
-3. Otimize hiperparâmetros
-4. Adicione suporte a mais formatos de áudio
+- **Épocas**: 20 (configurável)
 
 ## 📝 Licença
 
