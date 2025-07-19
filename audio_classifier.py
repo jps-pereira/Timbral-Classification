@@ -34,41 +34,30 @@ def save_spectrogram_as_image(spectrogram, filename, cmap='magma'):
     plt.savefig(filename)
     plt.close()
 
-# Exemplo de uso (apenas para demonstração, será removido ou adaptado para o fluxo principal)
-# if __name__ == '__main__':'
-#     # Crie um diretório para salvar os espectrogramas
-#     os.makedirs('spectrograms/mel', exist_ok=True)
-#     os.makedirs('spectrograms/stft', exist_ok=True)
-
-#     # Exemplo de arquivo de áudio (substitua pelo seu)
-#     # audio_file = 'path/to/your/audio.wav'
-#     # mel_spec = create_mel_spectrogram(audio_file)
-#     # stft_spec = create_stft_spectrogram(audio_file)
-
-#     # save_spectrogram_as_image(mel_spec, 'spectrograms/mel/audio_mel_spectrogram.png')
-#     # save_spectrogram_as_image(stft_spec, 'spectrograms/stft/audio_stft_spectrogram.png')
-
-#     print("Espectrogramas gerados e salvos.")
-
 
 class SpectrogramDataset(Dataset):
-    def __init__(self, img_dir, transform=None):
-        self.img_dir = img_dir
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
         self.transform = transform
-        self.img_names = [f for f in os.listdir(img_dir) if f.endswith(('.png', '.jpg'))]
-        # Assumindo que o nome do arquivo contém a classe, por exemplo: 'class_name_audio_id.png'
-        self.classes = sorted(list(set([name.split('_')[0] for name in self.img_names])))
+        self.image_paths = []
+        self.labels = []
+        self.classes = sorted(os.listdir(root_dir))
         self.class_to_idx = {cls_name: i for i, cls_name in enumerate(self.classes)}
 
+        for class_name in self.classes:
+            class_dir = os.path.join(root_dir, class_name)
+            for img_name in os.listdir(class_dir):
+                if img_name.endswith(('.png', '.jpg')):
+                    self.image_paths.append(os.path.join(class_dir, img_name))
+                    self.labels.append(self.class_to_idx[class_name])
+
     def __len__(self):
-        return len(self.img_names)
+        return len(self.image_paths)
 
     def __getitem__(self, idx):
-        img_name = self.img_names[idx]
-        img_path = os.path.join(self.img_dir, img_name)
+        img_path = self.image_paths[idx]
         image = Image.open(img_path).convert('RGB')
-        label_name = img_name.split('_')[0]
-        label = self.class_to_idx[label_name]
+        label = self.labels[idx]
 
         if self.transform:
             image = self.transform(image)
@@ -153,35 +142,11 @@ def evaluate_model(model, dataloader):
 
 
 if __name__ == '__main__':
-    # 1. Preparação dos dados (substitua por seus próprios dados)
-    # Para este exemplo, vamos simular a criação de alguns arquivos de imagem de espectrograma
-    # Em um cenário real, você teria diretórios com imagens de espectrogramas geradas a partir de seus áudios
-    # e organizadas por classe (ex: data/mel_spectrograms/class1/audio1.png, data/mel_spectrograms/class2/audio2.png)
-
-    # Criar diretórios de exemplo para simular dados
-    #os.makedirs('data/mel_spectrograms/class_a', exist_ok=True)
-    #os.makedirs('data/mel_spectrograms/class_b', exist_ok=True)
-    #os.makedirs('data/stft_spectrograms/class_a', exist_ok=True)
-    #os.makedirs('data/stft_spectrograms/class_b', exist_ok=True)
-
-    # Criar arquivos dummy para simular imagens de espectrogramas
-    # Em um cenário real, estas seriam imagens PNG/JPG reais de espectrogramas
-    #dummy_image_data = np.random.randint(0, 255, size=(224, 224, 3), dtype=np.uint8)
-    #dummy_image = Image.fromarray(dummy_image_data)
-
-    #for i in range(50):
-        #dummy_image.save(f'data/mel_spectrograms/class_a/mel_a_{i}.png')
-        #dummy_image.save(f'data/mel_spectrograms/class_b/mel_b_{i}.png')
-        #dummy_image.save(f'data/stft_spectrograms/class_a/stft_a_{i}.png')
-        #dummy_image.save(f'data/stft_spectrograms/class_b/stft_b_{i}.png')
-
-    #print("Arquivos dummy de espectrogramas criados para demonstração.")
-
     # 2. Carregar Datasets e Dataloaders
     data_transforms = get_transforms()
 
     # Mel-espectrogramas
-    mel_dataset = SpectrogramDataset(img_dir='dataset_png/mel_spectrograms', transform=data_transforms)
+    mel_dataset = SpectrogramDataset(root_dir='dataset_png/mel_spectrograms', transform=data_transforms)
     mel_train_size = int(0.8 * len(mel_dataset))
     mel_val_size = len(mel_dataset) - mel_train_size
     mel_train_dataset, mel_val_dataset = torch.utils.data.random_split(mel_dataset, [mel_train_size, mel_val_size])
@@ -194,7 +159,7 @@ if __name__ == '__main__':
     print(f"Mel-spectrograms: {mel_num_classes} classes encontradas.")
 
     # STFT-espectrogramas
-    stft_dataset = SpectrogramDataset(img_dir='dataset_png/stft_spectrograms', transform=data_transforms)
+    stft_dataset = SpectrogramDataset(root_dir='dataset_png/stft_spectrograms', transform=data_transforms)
     stft_train_size = int(0.8 * len(stft_dataset))
     stft_val_size = len(stft_dataset) - stft_train_size
     stft_train_dataset, stft_val_dataset = torch.utils.data.random_split(stft_dataset, [stft_train_size, stft_val_size])
@@ -263,7 +228,7 @@ def evaluate_ensemble_model(ensemble_model, mel_dataloader, stft_dataloader, cla
 
     # Certifique-se de que os dataloaders têm o mesmo número de amostras e ordem
     # Para um ensemble real, você precisaria de um DataLoader que retorne pares de mel/stft para a mesma amostra
-    # Para este exemplo, vamos iterar e assumir que a ordem é a mesma
+    # Para este exemplo, vamos iterar e assumir que a ordem é a mesma para as amostras de validação
     for (mel_inputs, mel_labels), (stft_inputs, stft_labels) in zip(mel_dataloader, stft_dataloader):
         mel_inputs = mel_inputs.to(device)
         stft_inputs = stft_inputs.to(device)
@@ -310,6 +275,6 @@ def evaluate_ensemble_model(ensemble_model, mel_dataloader, stft_dataloader, cla
     # Por simplicidade, vamos usar os dataloaders existentes e assumir que a ordem é a mesma para as amostras de validação.
     # ATENÇÃO: Em um cenário real, isso pode não ser verdade e levar a resultados incorretos.
     # O ideal seria ter um dataset que carregue o par (mel_image, stft_image) para cada amostra de áudio original.
-    evaluate_ensemble_model(ensemble_model, mel_dataloaders["val"], stft_dataloaders["val"], mel_dataset.classes)
+    evaluate_ensemble_model(ensemble_model, mel_dataloaders['val'], stft_dataloaders['val'], mel_dataset.classes)
 
 
