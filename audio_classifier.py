@@ -79,7 +79,7 @@ def load_resnet_model(num_classes, weights):
     return model
 
 # Função de treinamento do modelo
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=40, patience=6):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=20, patience=4):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -191,9 +191,6 @@ def evaluate_ensemble_model(ensemble_model, mel_dataloader, stft_dataloader, cla
     all_preds = []
     all_labels = []
 
-    # Certifique-se de que os dataloaders têm o mesmo número de amostras e ordem
-    # Para um ensemble real, você precisaria de um DataLoader que retorne pares de mel/stft para a mesma amostra
-    # Para este exemplo, vamos iterar e assumir que a ordem é a mesma para as amostras de validação
     for (mel_inputs, mel_labels), (stft_inputs, stft_labels) in zip(mel_dataloader, stft_dataloader):
         mel_inputs = mel_inputs.to(device)
         stft_inputs = stft_inputs.to(device)
@@ -252,7 +249,7 @@ if __name__ == '__main__':
     mel_model = load_resnet_model(mel_num_classes,weights=ResNet18_Weights.DEFAULT)
     mel_criterion = nn.CrossEntropyLoss()
     mel_optimizer = optim.Adam(mel_model.parameters(), lr=0.001)
-    mel_model = train_model(mel_model, mel_dataloaders, mel_criterion, mel_optimizer, num_epochs=40, patience=6)
+    mel_model = train_model(mel_model, mel_dataloaders, mel_criterion, mel_optimizer, num_epochs=20, patience=4)
     print("Avaliando modelo de Mel-espectrogramas no conjunto de validação:")
     evaluate_model(mel_model, mel_dataloaders['val'])
 
@@ -260,7 +257,7 @@ if __name__ == '__main__':
     stft_model = load_resnet_model(stft_num_classes,weights=ResNet18_Weights.DEFAULT)
     stft_criterion = nn.CrossEntropyLoss()
     stft_optimizer = optim.Adam(stft_model.parameters(), lr=0.001)
-    stft_model = train_model(stft_model, stft_dataloaders, stft_criterion, stft_optimizer, num_epochs=40, patience=6)
+    stft_model = train_model(stft_model, stft_dataloaders, stft_criterion, stft_optimizer, num_epochs=20, patience=4)
     print("Avaliando modelo de STFT-espectrogramas no conjunto de validação:")
     evaluate_model(stft_model, stft_dataloaders['val'])
 
@@ -268,7 +265,6 @@ if __name__ == '__main__':
     torch.save(mel_model.state_dict(), 'mel_resnet_model.pth')
     torch.save(stft_model.state_dict(), 'stft_resnet_model.pth')
     print("Modelos treinados salvos como mel_resnet_model.pth e stft_resnet_model.pth")
-
 
 
 # Classe para o Ensemble Model
@@ -338,16 +334,9 @@ def evaluate_ensemble_model(ensemble_model, mel_dataloader, stft_dataloader, cla
     ensemble_criterion = nn.CrossEntropyLoss()
     ensemble_optimizer = optim.Adam(ensemble_model.classifier.parameters(), lr=0.001) # Apenas treinar a camada de combinação
 
-    # Para treinar o ensemble, você precisaria de um DataLoader que forneça pares de imagens (mel, stft)
-    # Para simplificar, vamos apenas avaliar o ensemble com os modelos pré-treinados.
-    # Em um cenário real, você treinaria a camada de combinação do ensemble.
 
     print("Avaliando modelo Ensemble no conjunto de validação:")
-    # Para avaliação do ensemble, precisamos de um DataLoader que retorne ambos os tipos de espectrogramas para a mesma amostra.
-    # Isso exigiria uma modificação na classe SpectrogramDataset ou a criação de um novo DataLoader.
-    # Por simplicidade, vamos usar os dataloaders existentes e assumir que a ordem é a mesma para as amostras de validação.
-    # ATENÇÃO: Em um cenário real, isso pode não ser verdade e levar a resultados incorretos.
-    # O ideal seria ter um dataset que carregue o par (mel_image, stft_image) para cada amostra de áudio original.
+    
     evaluate_ensemble_model(ensemble_model, mel_dataloaders['val'], stft_dataloaders['val'], mel_dataset.classes)
 
 

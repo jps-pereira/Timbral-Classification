@@ -238,7 +238,7 @@ def predict_audio(audio_file, mel_model, stft_model, ensemble_model):
 
 # Interface principal
 def main():
-    st.title("Classificação de Instrumentos Musicais")
+    st.title("🎵 Classificação de Instrumentos")
     st.write("Upload de um arquivo de áudio para classificação usando mel-espectrogramas e espectrogramas STFT")
     
     # Carregar modelos
