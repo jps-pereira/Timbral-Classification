@@ -74,7 +74,7 @@ def get_transforms():
 
 # Função para carregar o modelo e configurar para Transfer Learning
 def load_resnet_model(num_classes):
-    model = models.resnet18(pretrained=True)
+    model = models.resnet18(weights=True)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, num_classes)
     return model
