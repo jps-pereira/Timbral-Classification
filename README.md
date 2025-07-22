@@ -2,7 +2,7 @@
 
 Este projeto implementa um sistema completo de classificação de áudio usando mel-espectrogramas e espectrogramas lineares (STFT) com CNNs e Transfer Learning.
 
-## 📋 Características
+## Características
 
 - **Processamento de Áudio**: Conversão de arquivos de áudio em mel-espectrogramas e espectrogramas STFT
 - **Transfer Learning**: Utiliza ResNet18 pré-treinada para classificação de imagens de espectrogramas
@@ -10,7 +10,7 @@ Este projeto implementa um sistema completo de classificação de áudio usando 
 - **Interface Web**: Interface Streamlit para classificação em tempo real
 - **Métricas Detalhadas**: Avaliação completa com relatórios de classificação
 
-## 🚀 Instalação
+## Instalação
 
 1. Clone ou baixe os arquivos do projeto
 2. Instale as dependências:
@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 3. Preferencialmente faça a instalação em ambiente virtual para não haver conflitos entre as bibliotecas.
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 ├── audio_classifier.py      # Script principal de treinamento
@@ -32,7 +32,7 @@ pip install -r requirements.txt
     └── stft_spectrograms/   # Imagens de espectrogramas STFT
 ```
 
-## 🎯 Como Usar
+## Como Usar
 
 ### 1. Preparação dos Dados
 
@@ -105,7 +105,7 @@ A interface permite:
 ensemble_model = EnsembleModel(mel_model, stft_model, num_classes)
 ```
 
-## 📊 Avaliação
+## Avaliação
 
 O sistema fornece:
 - **Acurácia** para cada modelo individual
@@ -113,7 +113,7 @@ O sistema fornece:
 - **Comparação de confiança** entre métodos
 - **Visualização** dos espectrogramas
 
-## 🎧 Tipos de Espectrogramas
+## Tipos de Espectrogramas
 
 ### Mel-espectrogramas
 - Representação baseada na escala mel (percepção auditiva humana)
@@ -125,7 +125,7 @@ O sistema fornece:
 - Representação linear da frequência
 - Preserva mais detalhes espectrais
 
-## ⚙️ Configurações
+## Configurações
 
 ### Parâmetros de Áudio
 - **Taxa de amostragem**: 22050 Hz
@@ -139,7 +139,7 @@ O sistema fornece:
 - **Optimizer**: Adam
 - **Épocas**: 20 (configurável)
 
-## 📝 Licença
+## Licença
 
 Este projeto é fornecido como exemplo educacional. Adapte conforme necessário para seus casos de uso específicos.
 
