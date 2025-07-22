@@ -1,4 +1,4 @@
-# 🎵 Classificador de Áudio com Deep Learning
+# Classificador de Áudio com Deep Learning
 
 Este projeto implementa um sistema completo de classificação de áudio usando mel-espectrogramas e espectrogramas lineares (STFT) com CNNs e Transfer Learning.
 
